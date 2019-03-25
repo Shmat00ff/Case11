@@ -13,14 +13,18 @@ def main(directory):
     print(directory)
     print('1. Просмотр каталога \n2. На уровень вверх \n3. На уровень вниз\n4. Количество файлов и каталогов\n5. Размер текущего каталога(в байтах)\n6. Поиск файла\n7. Выход из программы')
     vibor = int(input('Выберите пункт меню: '))
-    return runCommand(vibor, directory)
+    if vibor in [1,2,3,4,5,6,7]:
+        return runCommand(vibor, directory)
+    else:
+        print('Вы ввели неверное значение.')
+        main(os.getcwd())
 
 
 def runCommand(command, directory):
     '''Определяет по номеру команды command, какую функцию следует выполнить.'''
     if command == 1:
         print(os.listdir(directory))
-        #выведет названия файлов из каталога
+        main(directory)
 
     elif command == 2:
         os.chdir(os.getcwd()[:os.getcwd().rfind("\\")])
@@ -29,18 +33,34 @@ def runCommand(command, directory):
 
     elif command == 3:
         print(os.getcwd())
-        runCommand(1, directory)
-        currentDir = str(input('Введите имя подкаталога: '))
-        os.chdir(path = currentDir)
-        main(os.chdir(path = currentDir))
+        print(os.listdir(directory))
+        try:
+            currentDir = str(input('Введите имя подкаталога: '))
+            os.chdir(path = currentDir)
+            main(os.chdir(os.getcwd()))
+        except FileNotFoundError:
+            print('Вы ввели неверное имя файла.')
+            runCommand(3, directory)
 
     elif command == 4:
-        print(countFiles(path))
+        print(countFiles(directory))
+        main(os.getcwd())
 
     elif command == 5:
-        # кому это вообще надо..
-        print(countBytes(path))
+        print(countBytes(directory))
+        main(os.getcwd())
 
+    elif command == 6:
+        target = input('Введите имя файла: ')
+        if findFiles(target, directory):
+            print(findFiles(target, directory))
+            main(os.getcwd())
+        else:
+            print('Файлы с таким именем не найдены.')
+            runCommand(6, directory)
+
+    elif command == 7:
+        exit()
 
 
 
@@ -48,30 +68,23 @@ def countFiles(path):
     '''
     Рекурсивная функция подсчитывающая количество файлов в указанном каталоге path.
     В подсчет включаются все файлы, находящиеся в подкаталогах. Возвращает количество файлов.'''
+    a = []
+    for top, dirs, files in os.walk(path):
+        for nm in files:
+            a.append(os.path.join(top, nm))
+    print(len(a))
 
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-
-
-    onlyfiles = next(os.walk(dir))[2]  # dir is your directory path as string
-    print
-    len(onlyfiles)
-
-    for root, dirs, files in os.walk("/mydir"):
-        for file in files:
-            if file.endswith(".txt"):
-                print(os.path.join(root, file))
 
 def countBytes(path):
     '''Рекурсивная функция подсчитывающая суммарный объем (в байтах) всех файлов в указанном каталоге path.
      В подсчет включаются все файлы, находящиеся в подкаталогах. Возвращает суммарное количество байт.'''
 
-    def get_size(start_path='.'):
-        total_size = 0
-        for dirpath, dirnames, filenames in os.walk(start_path):
-            for f in filenames:
-                fp = os.path.join(dirpath, f)
-                total_size += os.path.getsize(fp)
-        return total_size
+    m = 0
+    for top, dirs, files in os.walk(os.getcwd()):
+        for nm in files:
+            m += os.path.getsize(os.path.join(top, nm))
+
+    print(m)
 
 
 
