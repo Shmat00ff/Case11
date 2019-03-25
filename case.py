@@ -1,3 +1,8 @@
+"""Case-study #11
+Разработчики:
+Bayanova A. 70%, Shmatov D. 60%
+"""
+
 import os
 
 #  os.listdir(path=".") - список файлов и директорий в папке.
@@ -88,7 +93,12 @@ def countBytes(path):
 
 
 
-def findFiles(target, path):
+def findFiles(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files or name in root or name in dirs:
+            return os.path.join(root, name)
+
+
     '''Рекурсивная функция, формирующая список путей к файлам, в имени которых содержится target.
      В поиск включаются все подкаталоги каталога path. В случае если файлы не найдены, выводит
      соответствующее сообщение.'''
